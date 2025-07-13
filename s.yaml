@@ -15,22 +15,16 @@ resources:
       pre-deploy:
         - run: |
             echo "Configuring for Alibaba Cloud FC deployment with standalone mode..."
-            # 检查是否已有 standalone 配置
             if ! grep -q "output.*standalone" next.config.ts; then
-              # 注入 standalone 配置
               sed -i 's/const nextConfig\: NextConfig = {/const nextConfig\: NextConfig = {\n    output: \"standalone\",/g' next.config.ts
               echo "Standalone mode added to next.config.ts"
             else
               echo "Standalone mode already configured"
             fi
           path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm config set unsafe-perm true
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm install
           path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm install --force
-          path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm rebuild lightningcss --platform=linux --arch=x64
-          path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm run build
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm run build
           path: ./
         - run: cp -r public .next/standalone/public
           path: ./
