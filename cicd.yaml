@@ -1,0 +1,40 @@
+kind: Pipeline
+name: pipeline-run-<%.releaseVersion%>
+labels:
+  accountId: '1011061961683543'
+  appName: next-template
+  envName: next-template-production
+spec:
+  context:
+    data:
+      appName: next-template
+  templateSpec:
+    context:
+      data:
+        dingdingNotification:
+          enable: false
+          message:
+            at:
+              isAtAll: false
+            msgtype: text
+          skipOnSuccess: false
+        envName: next-template-production
+        appName: next-template
+        deployFile: s.yaml
+    tasks:
+      - name: build-and-deploy
+        context:
+          data:
+            displayName: "构建部署"
+            enable: true
+            steps:
+              - plugin: "@serverless-cd/s-setup"
+              - plugin: "@serverless-cd/runtime-setup"
+                inputs:
+                  runtime:
+                  - nodejs20
+              - plugin: "@serverless-cd/checkout"
+              - plugin: "@serverless-cd/s-deploy"
+                inputs:
+                  debugMode: true
+        taskTemplate: serverless-runner-task
