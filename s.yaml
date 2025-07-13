@@ -7,13 +7,12 @@ access: "personal"
 
 vars:
   region: "cn-hongkong"
-  functionName: "test-fc"
+  functionName: "next-template"
 resources:
   start_next:
     component: fc3
     actions:
       pre-deploy:
-        # 自动注入 standalone 配置
         - run: |
             echo "Configuring for Alibaba Cloud FC deployment with standalone mode..."
             # 检查是否已有 standalone 配置
@@ -25,9 +24,13 @@ resources:
               echo "Standalone mode already configured"
             fi
           path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm install
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm config set unsafe-perm true
           path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm run build
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm install --force
+          path: ./
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm rebuild lightningcss --platform=linux --arch=x64
+          path: ./
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm run build
           path: ./
         - run: cp -r public .next/standalone/public
           path: ./

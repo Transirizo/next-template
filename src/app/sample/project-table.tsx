@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/table"
 import Link from "next/link"
 import { Sample } from "@/types/sample"
+import { Table as TableType } from "@tanstack/table-core"
 
 export function SampleTable({ data }: { data: Sample[] }) {
   const columns = SampleColumns()
@@ -174,7 +175,7 @@ function SampleColumns(): ColumnDef<Sample>[] {
   ]
 }
 
-function ItemFilter({ table }: { table: import("@tanstack/table-core").Table<Sample> }) {
+function ItemFilter({ table }: { table: TableType<Sample> }) {
   return (
     <Input
       placeholder="Filter projects..."
@@ -187,7 +188,7 @@ function ItemFilter({ table }: { table: import("@tanstack/table-core").Table<Sam
   )
 }
 
-function ColumnSelector({ table }: { table: import("@tanstack/table-core").Table<Sample> }) {
+function ColumnSelector({ table }: { table: TableType<Sample> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
