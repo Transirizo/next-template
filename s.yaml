@@ -13,8 +13,6 @@ resources:
     component: fc3
     actions:
       pre-deploy:
-        - run: echo "NEXT_PUBLIC_SUPABASE_URL: ${env(NEXT_PUBLIC_SUPABASE_URL)}" && echo node -v
-          path: ./
         - run: |
             echo "Configuring for Alibaba Cloud FC deployment with standalone mode..."
             if ! grep -q "output.*standalone" next.config.ts; then
