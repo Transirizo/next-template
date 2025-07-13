@@ -1,0 +1,17 @@
+{
+  "api": {
+    "common": {
+      "okMessageByDefault": "Operation successful"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "register": "Register",
+      "noAccount": "Don't have an account? ",
+      "email": "Email",
+      "password": "Password",
+      "login": "Login"
+    }
+  }
+}

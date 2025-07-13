@@ -1,0 +1,23 @@
+{
+  "api": {
+    "common": {
+      "okMessageByDefault": "操作成功"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "登录",
+      "register": "注册",
+      "noAccount": "没有账号？",
+      "email": "邮箱",
+      "password": "密码",
+      "login": "登录"
+    },
+    "register": {
+      "title": "注册",
+      "email": "邮箱",
+      "password": "密码",
+      "register": "注册"
+    }
+  }
+}

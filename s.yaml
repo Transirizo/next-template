@@ -1,0 +1,76 @@
+# 阿里云部署，如果需要直接将仓库接入即可。
+
+edition: 3.0.0
+name: start-next-app
+# 修改为你的 token. See Also: https://docs.serverless-devs.com/
+access: "personal"
+
+vars:
+  region: "cn-hongkong"
+  functionName: "test-fc"
+resources:
+  start_next:
+    component: fc3
+    actions:
+      pre-deploy:
+        # 自动注入 standalone 配置
+        - run: |
+            echo "Configuring for Alibaba Cloud FC deployment with standalone mode..."
+            # 检查是否已有 standalone 配置
+            if ! grep -q "output.*standalone" next.config.ts; then
+              # 注入 standalone 配置
+              sed -i 's/const nextConfig\: NextConfig = {/const nextConfig\: NextConfig = {\n    output: \"standalone\",/g' next.config.ts
+              echo "Standalone mode added to next.config.ts"
+            else
+              echo "Standalone mode already configured"
+            fi
+          path: ./
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm install
+          path: ./
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm run build
+          path: ./
+        - run: cp -r public .next/standalone/public
+          path: ./
+        - run: mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/
+          path: ./
+    props:
+      region: ${vars.region}
+      description: Serverless Devs Web Framework Function
+      runtime: custom.debian10
+      timeout: 60
+      cpu: 2
+      memorySize: 2048
+      diskSize: 512
+      instanceConcurrency: 100
+      layers:
+        - acs:fc:${vars.region}:official:layers/Nodejs20/versions/1
+      environmentVariables:
+        PATH: >-
+          /opt/nodejs20/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+      customRuntimeConfig:
+        command:
+          - node
+          - ./server.js
+        port: 3000
+      functionName: ${vars.functionName}
+      code: ./.next/standalone
+      triggers:
+        - triggerName: httpTrigger
+          triggerType: http
+          triggerConfig:
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            authType: anonymous
+  fc3_domain_0:
+    component: fc3-domain
+    props:
+      region: ${vars.region}
+      domainName: auto
+      protocol: HTTP
+      routeConfig:
+        routes:
+          - path: /*
+            functionName: ${vars.functionName}
