@@ -155,25 +155,25 @@ npm run dev
 │   │   └── cli-latest
 │   ├── .gitignore
 │   └── config.toml
-├── .env                              # 通用环境变量
-├── .env.development                  # 开发环境变量 npm run dev 时使用
-├── .env.production                   # 生产环境变量 npm run build 时使用（建议集成至 CI/CD 流水线）
-├── .eslintrc.json                    # ESLint 配置
-├── .gitignore                        # Git 忽略文件
-├── .rule_for_your_ai_editor.md       # AI IDE 提示词，需要自行参考配置
-├── LICENSE                           # 许可证
-├── README.md                         # 项目说明
-├── components.json                   # Shadcn/ui 组件配置
-├── next-env.d.ts                     # Next.js 生成的类型文件
-├── next.config.ts                    # Next.js 配置
-├── package-lock.json                 # 包管理器锁定文件
-├── package.json                      # 包管理器配置
-├── pnpm-lock.yaml                    # 包管理器锁定文件
-├── pnpm-workspace.yaml               # 包管理器工作区配置
-├── postcss.config.mjs                # PostCSS 配置 （Tailwind CSS 配置）
-├── s.yaml                            # 阿里云 Serverless 部署 配置文件
-├── supabase.sql                      # Supabase 数据库初始化脚本（也可以自行添加 migration 文件夹）
-└── tsconfig.json                     # TypeScript 配置
+├── .env                                # 通用环境变量
+├── .env.development                    # 开发环境变量 npm run dev 时使用
+├── .env.production                     # 生产环境变量 npm run build 时使用（建议集成至 CI/CD 流水线）
+├── .eslintrc.json                      # ESLint 配置
+├── .gitignore                          # Git 忽略文件
+├── .rule_for_your_ai_editor.md         # AI IDE 提示词，需要自行参考配置
+├── LICENSE                             # 许可证
+├── README.md                           # 项目说明
+├── components.json                     # Shadcn/ui 组件配置
+├── next-env.d.ts                       # Next.js 生成的类型文件
+├── next.config.ts                      # Next.js 配置
+├── package-lock.json                   # 包管理器锁定文件
+├── package.json                        # 包管理器配置
+├── pnpm-lock.yaml                      # 包管理器锁定文件
+├── pnpm-workspace.yaml                 # 包管理器工作区配置
+├── postcss.config.mjs                  # PostCSS 配置 （Tailwind CSS 配置）
+├── s.yaml                              # 阿里云 Serverless 部署 配置文件
+├── supabase.sql                        # Supabase 数据库初始化脚本（也可以自行添加 migration 文件夹）
+└── tsconfig.json                       # TypeScript 配置
 ```
 
 ## 部署
@@ -194,9 +194,3 @@ npm run dev
 
 #### 阿里云 Serverless 应用
 [https://www.aliyun.com/product/serverless](https://www.aliyun.com/product/serverless)
-
-#### 腾讯云 Serverless 应用
-[https://www.tencentcloud.com/product/serverless](https://www.tencentcloud.com/product/serverless)
-
-#### 华为云 Serverless 应用
-[https://www.huaweicloud.com/product/serverless](https://www.huaweicloud.com/product/serverless)
