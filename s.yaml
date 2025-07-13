@@ -22,9 +22,9 @@ resources:
               echo "Standalone mode already configured"
             fi
           path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm install
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm install
           path: ./
-        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm run build
+        - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm run build
           path: ./
         - run: cp -r public .next/standalone/public
           path: ./
