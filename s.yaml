@@ -13,7 +13,7 @@ resources:
     component: fc3
     actions:
       pre-deploy:
-        - run: echo "NEXT_PUBLIC_SUPABASE_URL: ${env("NEXT_PUBLIC_SUPABASE_URL")}" && echo node -v
+        - run: echo "NEXT_PUBLIC_SUPABASE_URL: ${env(NEXT_PUBLIC_SUPABASE_URL)}" && echo node -v
           path: ./
         - run: |
             echo "Configuring for Alibaba Cloud FC deployment with standalone mode..."
@@ -25,6 +25,7 @@ resources:
             fi
           path: ./
         - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm install -g pnpm
+          path: ./
         - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && pnpm install
           path: ./
         - run: export PATH=/usr/local/versions/node/v20.8.1/bin:$PATH && npm run build
@@ -45,8 +46,8 @@ resources:
       layers:
         - acs:fc:${vars.region}:official:layers/Nodejs20/versions/1
       environmentVariables:
-        NEXT_PUBLIC_SUPABASE_URL: ${env("NEXT_PUBLIC_SUPABASE_URL")}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${env("NEXT_PUBLIC_SUPABASE_ANON_KEY")}
+        NEXT_PUBLIC_SUPABASE_URL: ${env(NEXT_PUBLIC_SUPABASE_URL)}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${env(NEXT_PUBLIC_SUPABASE_ANON_KEY)}
         PATH: >-
           /opt/nodejs20/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
       customRuntimeConfig:
