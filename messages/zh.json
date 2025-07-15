@@ -19,5 +19,45 @@
       "password": "密码",
       "register": "注册"
     }
+  },
+  "home": {
+    "nav": {
+      "github": "GitHub",
+      "docs": "文档",
+      "try": "体验"
+    },
+    "hero": {
+      "title": "Next.js 通用模板和面向中国地区业务的 CI/CD 解决方案。",
+      "subtitle": "专为中国开发者打造，解决海外服务访问困难问题。集成阿里云FC部署方案，提供完整开发流程和最佳实践。",
+      "clone": "克隆仓库",
+      "sample": "示例页面",
+      "copy": "复制"
+    },
+    "features": {
+      "fc": {
+        "title": "阿里云FC集成",
+        "description": "内置阿里云函数计算部署配置，支持从 Vercel 无缝切换，解决国内访问速度问题。"
+      },
+      "supabase": {
+        "title": "Supabase集成",
+        "description": "对接阿里云 PolarDB Supabase，提供国内分布式数据库解决方案。"
+      },
+      "i18n": {
+        "title": "国际化支持",
+        "description": "使用 next-intl 实现完整 i18n 解决方案，支持中英文切换，轻松拓展其他语言。"
+      },
+      "http": {
+        "title": "通用HTTP模板",
+        "description": "预设 API 路由结构和错误处理，Zod 验证，集成 TanStack Query 实现高效数据获取和缓存。"
+      },
+      "tech": {
+        "title": "现代技术栈",
+        "description": "基于 Next.js 15 和 React 19 构建，使用 Tailwind CSS、Radix UI 组件和 TypeScript。"
+      },
+      "ready": {
+        "title": "开箱即用",
+        "description": "内置认证、表格、表单等常用组件，提供完整的开发脚手架，快速启动项目。"
+      }
+    }
   }
 }
