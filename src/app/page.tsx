@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
-import { ArrowRightIcon, CodeIcon, GithubIcon, CheckIcon, BookIcon } from "lucide-react";
+import { ArrowRightIcon, CodeIcon, GithubIcon, BookIcon } from "lucide-react";
 import Image from "next/image";
 
 export default function Home() {
@@ -13,18 +13,7 @@ export default function Home() {
     toast.success("Copied to clipboard")
   }
 
-  const features = [
-    "Next.js 15",
-    "React 19",
-    "Shadcn/ui",
-    "TanStack Query",
-    "Supabase",
-    "i18n",
-    "Dark/Light mode",
-    "Form validation",
-    "TypeScript",
-    "Tailwind CSS"
-  ];
+
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen w-full p-6 font-serif">

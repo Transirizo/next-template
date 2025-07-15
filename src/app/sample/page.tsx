@@ -137,7 +137,7 @@ function FileUploadSection() {
 
   const handleUpload = async () => {
     if (!file) return;
-    const { data, error } = await client.storage
+    const { error } = await client.storage
       .from('test')
       .upload('/test.jpg', file, {
         cacheControl: '3600',
