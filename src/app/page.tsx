@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowRightIcon, CodeIcon, GithubIcon, BookIcon, CloudIcon, DatabaseIcon, GlobeIcon, LayoutIcon } from "lucide-react";
 import Image from "next/image";
-import { ReactNode } from "react";
 import { LocaleSwitcher } from "@/lib/i18n/locale-switcher";
 import { useTranslations } from "next-intl";
 
@@ -67,7 +66,6 @@ interface HeroProps {
 }
 
 function Hero({ onCopy }: HeroProps) {
-  const t = useTranslations("home");
   const heroT = useTranslations("home.hero");
   const featuresT = useTranslations("home.features");
 
