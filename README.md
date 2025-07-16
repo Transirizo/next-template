@@ -83,43 +83,54 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=控制台输出的 KEY
 然后运行以下命令启动 Next.js 应用：
 
 ```bash
-npm run dev
+pnpm install
+pnpm run dev
 ```
+
+## 构建和发布指南
+本项目已受部署流水线控制，直接推送到 main 分支即可自动部署。部署前请先通过以下命令进行预检，否则流水线会失败。
+
+```bash
+pnpm run lint
+pnpm run build
+```
+
+
 
 ## 目录解析
 
 ```bash
 .
-├── messages                          # 国际化翻译文件 next-intl
+├── messages                            # 国际化翻译文件 next-intl
 │   ├── accept-language.json
 │   ├── en.json
 │   └── zh.json
-├── public                            # 公共资源，图片、字体等
+├── public                              # 公共资源，图片、字体等
 ├── src
 │   ├── app
-│   │   ├── api                       # Next.js 文件路由
+│   │   ├── api                         # Next.js 文件路由
 │   │   │   ├── auth
 │   │   │   │   ├── login
-│   │   │   │   │   ├── query.ts      # Tanstack Query 查询模板
-│   │   │   │   │   ├── route.ts      # Next.js API Routes 路由处理
-│   │   │   │   │   └── type.ts       # 请求和响应类型（区别于通用类型）
+│   │   │   │   │   ├── query.ts        # Tanstack Query 查询模板
+│   │   │   │   │   ├── route.ts        # Next.js API Routes 路由处理
+│   │   │   │   │   └── type.ts         # 请求和响应类型（区别于通用类型）
 │   │   │   │   └── register
 │   │   │   └── sample
 │   │   ├── auth          
 │   │   │   ├── login
-│   │   │   │   └── page.tsx          # Next.js 页面
+│   │   │   │   └── page.tsx            # Next.js 页面
 │   │   │   └── register
 │   │   │       └── page.tsx
 │   │   ├── sample
 │   │   │   ├── page.tsx
-│   │   │   └── project-table.tsx     # 页面内组件拆分
-│   │   ├── favicon.ico               # 网站图标
-│   │   ├── globals.css               # 全局样式 (Tailwind CSS)
-│   │   ├── layout.tsx                # Next.js 布局 (用于所有子孙页面) 初始化 Tanstack Query 和 Supabase 客户端
-│   │   └── page.tsx                  # 首页
-│   ├── components                    # 组件
-│   │   ├── table                     # 自定义通用业务组件
-│   │   └── ui                        # Shadcn/ui 组件文件夹
+│   │   │   └── project-table.tsx       # 页面内组件拆分
+│   │   ├── favicon.ico                 # 网站图标
+│   │   ├── globals.css                 # 全局样式 (Tailwind CSS)
+│   │   ├── layout.tsx                  # Next.js 布局 (用于所有子孙页面) 初始化 Tanstack Query 和 Supabase 客户端
+│   │   └── page.tsx                    # 首页
+│   ├── components                      # 组件
+│   │   ├── table                       # 自定义通用业务组件
+│   │   └── ui                          # Shadcn/ui 组件文件夹
 │   │       ├── badge.tsx
 │   │       ├── button.tsx
 │   │       ├── dropdown-menu.tsx
