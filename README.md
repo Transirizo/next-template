@@ -69,6 +69,7 @@ graph TD
 如果你希望自己独立运行 Supabase，确保你的本地环境安装有 Docker，然后运行以下命令启动 Supabase：
 
 ```bash
+pnpm i supabase --save-dev
 supabase init
 supabase start
 ```
