@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     icon: "/icon/logo.svg",
   },
   title: "Next-template",
-  description: "Next.js with Shadcn UI, Tanstack Query, and Supabase. Also implements with i18n, auth, and more.",
+  description: "Next.js with Shadcn UI, Tanstack Query. Also implements with i18n, auth, and more.",
 };
 
 export default async function RootLayout({
@@ -22,6 +22,9 @@ export default async function RootLayout({
   const locale = await getLocale();
   return (
     <html lang={locale} suppressHydrationWarning> 
+      <head>
+        <script src="https://lf1-cdn-tos.bytegoofy.com/goofy/lark/op/h5-js-sdk-1.5.31.js"></script>
+      </head>
       <body className={`antialiased`}>
         <NextIntlClientProvider>
           <ThemeProvider

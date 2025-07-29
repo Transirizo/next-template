@@ -32,10 +32,6 @@
         "title": "Alibaba Cloud FC",
         "description": "Built-in Alibaba Cloud FC deployment configuration, seamless switch from Vercel, solving access speed issues in China."
       },
-      "supabase": {
-        "title": "Supabase Integration",
-        "description": "Integration with Alibaba Cloud PolarDB Supabase, providing distributed database solutions in China."
-      },
       "i18n": {
         "title": "i18n Support",
         "description": "Complete i18n solution using next-intl, supporting English and Chinese, easily extensible to other languages."

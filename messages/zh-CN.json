@@ -38,10 +38,6 @@
         "title": "阿里云FC集成",
         "description": "内置阿里云函数计算部署配置，支持从 Vercel 无缝切换，解决国内访问速度问题。"
       },
-      "supabase": {
-        "title": "Supabase集成",
-        "description": "对接阿里云 PolarDB Supabase，提供国内分布式数据库解决方案。"
-      },
       "i18n": {
         "title": "国际化支持",
         "description": "使用 next-intl 实现完整 i18n 解决方案，支持中英文切换，轻松拓展其他语言。"

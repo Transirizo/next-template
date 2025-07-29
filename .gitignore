@@ -14,9 +14,6 @@
 .env*
 .env
 
-# supabase
-supabase/
-
 # testing
 /coverage
 

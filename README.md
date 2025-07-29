@@ -34,9 +34,9 @@ graph TD
     subgraph 后端层
         Next --> APIRoutes[Next.js API Routes]
         APIRoutes --> ZodBack
-        APIRoutes --> Supabase[Supabase]
-        Supabase --> Auth[认证服务]
-        Supabase --> DB[PostgreSQL 数据库]
+        APIRoutes --> MockData[Mock Data Store]
+        MockData --> Auth[认证服务]
+        MockData --> DB[内存数据库]
     end
     
     Next --> TQ
@@ -47,8 +47,6 @@ graph TD
 
 - [Next.js 15](https://nextjs.org/)
   前后端框架
-- [Supabase](https://supabase.com/)
-  数据库
 - [TanStack Query](https://tanstack.com/query/v5/)
   数据获取与缓存
 - [TanStack Table](https://tanstack.com/table/v8/)
@@ -66,22 +64,7 @@ graph TD
 
 ## 启动指南
 
-如果你希望自己独立运行 Supabase，确保你的本地环境安装有 Docker，然后运行以下命令启动 Supabase：
-
-```bash
-pnpm i supabase --save-dev
-supabase init
-supabase start
-```
-
-如果你有测试环境，则修改 `.env.development` 文件中的 Supabase 配置。
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=控制台输出的 KEY
-```
-
-然后运行以下命令启动 Next.js 应用：
+运行以下命令启动 Next.js 应用：
 
 ```bash
 pnpm install
@@ -127,7 +110,7 @@ pnpm run build
 │   │   │   └── project-table.tsx       # 页面内组件拆分
 │   │   ├── favicon.ico                 # 网站图标
 │   │   ├── globals.css                 # 全局样式 (Tailwind CSS)
-│   │   ├── layout.tsx                  # Next.js 布局 (用于所有子孙页面) 初始化 Tanstack Query 和 Supabase 客户端
+│   │   ├── layout.tsx                  # Next.js 布局 (用于所有子孙页面) 初始化 Tanstack Query
 │   │   └── page.tsx                    # 首页
 │   ├── components                      # 组件
 │   │   ├── table                       # 自定义通用业务组件
@@ -150,23 +133,12 @@ pnpm run build
 │   │   ├── i18n
 │   │   │   ├── locale-switcher.tsx     # 语言切换器实现
 │   │   │   └── request.ts              # 国际化请求工具实现
-│   │   ├── supabase                    # Supabase 工具 （模板代码）
-│   │   │   ├── client.ts               
-│   │   │   ├── middleware.ts      
-│   │   │   └── server.ts
 │   │   ├── tanstack-query
 │   │   │   └── tanstack-provider.tsx   # Tanstack Query 模板代码
 │   │   └── utils.ts                    # 通用工具函数
 │   ├── types
 │   │   └── sample.ts                   # 业务类型定义
 │   └── middleware.ts                   # 中间件 （鉴权拦截）
-├── supabase                            # 本地 Supabase 数据库
-│   ├── .branches
-│   │   └── _current_branch
-│   ├── .temp
-│   │   └── cli-latest
-│   ├── .gitignore
-│   └── config.toml
 ├── .env                                # 通用环境变量
 ├── .env.development                    # 开发环境变量 npm run dev 时使用
 ├── .env.production                     # 生产环境变量 npm run build 时使用（建议集成至 CI/CD 流水线）
@@ -184,20 +156,10 @@ pnpm run build
 ├── pnpm-workspace.yaml                 # 包管理器工作区配置
 ├── postcss.config.mjs                  # PostCSS 配置 （Tailwind CSS 配置）
 ├── s.yaml                              # 阿里云 Serverless 部署 配置文件
-├── supabase.sql                        # Supabase 数据库初始化脚本（也可以自行添加 migration 文件夹）
 └── tsconfig.json                       # TypeScript 配置
 ```
 
 ## 部署
-### supabase
-
-#### Supabase 官方服务
-[https://supabase.com/](https://supabase.com/)
-#### 阿里云 PolarDB supabase
-[https://www.aliyun.com/product/polardb/supabase](https://www.aliyun.com/product/polardb/supabase)
-
-
-### 应用本体
 #### Vercel
 [https://vercel.com/](https://vercel.com/)
 
