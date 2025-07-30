@@ -72,83 +72,40 @@ export default function UseAPI() {
   };
 
   return (
-    <div className="useapi">
-      <div className="item_title">
+    <div className="mt-2.5 w-full h-auto flex flex-col">
+      <div className="w-auto ml-[5vw] h-10 flex flex-row">
         <h4>JSAPI使用示范</h4>
       </div>
 
-      <div className="item_desc">
-        <span className="desc_content">获取系统信息</span>
+      <div className="w-auto mx-[5vw] h-7.5 flex flex-row">
+        <span className="text-sm self-center text-gray-500">获取系统信息</span>
       </div>
-      <button className="item_button" onClick={getSystemInfo}>
+      <button 
+        className="mx-[5vw] my-2.5 px-5 py-2.5 bg-blue-600 text-white border-none rounded cursor-pointer text-sm hover:bg-blue-700 active:bg-blue-800" 
+        onClick={getSystemInfo}
+      >
         JSAPI - getSystemInfo
       </button>
 
-      <div className="item_desc">
-        <span className="desc_content">显示操作菜单</span>
+      <div className="w-auto mx-[5vw] h-7.5 flex flex-row">
+        <span className="text-sm self-center text-gray-500">显示操作菜单</span>
       </div>
-      <button className="item_button" onClick={showActionSheet}>
+      <button 
+        className="mx-[5vw] my-2.5 px-5 py-2.5 bg-blue-600 text-white border-none rounded cursor-pointer text-sm hover:bg-blue-700 active:bg-blue-800" 
+        onClick={showActionSheet}
+      >
         JSAPI - showActionSheet
       </button>
 
-      <div className="item_desc">
-        <span className="desc_content">图片预览</span>
+      <div className="w-auto mx-[5vw] h-7.5 flex flex-row">
+        <span className="text-sm self-center text-gray-500">图片预览</span>
       </div>
-      <button className="item_button" onClick={previewImage}>
+      <button 
+        className="mx-[5vw] my-2.5 px-5 py-2.5 bg-blue-600 text-white border-none rounded cursor-pointer text-sm hover:bg-blue-700 active:bg-blue-800" 
+        onClick={previewImage}
+      >
         JSAPI - previewImage
       </button>
-
-      <style jsx>{`
-        .useapi {
-          margin-top: 10px;
-          width: 100%;
-          height: auto;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .item_title {
-          width: auto;
-          margin-left: 5vw;
-          height: 40px;
-          display: flex;
-          flex-direction: row;
-        }
-
-        .item_desc {
-          width: auto;
-          margin-left: 5vw;
-          margin-right: 5vw;
-          height: 30px;
-          display: flex;
-          flex-direction: row;
-        }
-
-        .desc_content {
-          font-size: small;
-          align-self: center;
-          color: grey;
-        }
-
-        .item_button {
-          margin: 10px 5vw;
-          padding: 10px 20px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .item_button:hover {
-          background-color: #0056b3;
-        }
-
-        .item_button:active {
-          background-color: #004085;
-        }
-      `}</style>
     </div>
   );
 }

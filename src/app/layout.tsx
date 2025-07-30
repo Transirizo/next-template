@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TanstackProvider } from "@/lib/tanstack-query/tanstack-provider";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "@/lib/theme-provider/theme-provider"
-
+import { ThemeProvider } from "@/lib/theme-provider/theme-provider";
+import { ThirdPartyScripts } from "@/lib/third-party-scripts/third-party-scripts";
 export const metadata: Metadata = {
   icons: {
     icon: "/icon/logo.svg",
   },
-  title: "Next-template",
+  title: "资产管理",
   description: "Next.js with Shadcn UI, Tanstack Query, and Feishu integration.",
 };
 
@@ -18,10 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> 
-      <head>
-        <script src="https://lf1-cdn-tos.bytegoofy.com/goofy/lark/op/h5-js-sdk-1.5.31.js"></script>
-      </head>
+    <html lang="en" suppressHydrationWarning>
+      <head></head>
       <body className={`antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -29,9 +27,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-        <Toaster />
-        <TanstackProvider>{children}</TanstackProvider>
+          <Toaster />
+          <TanstackProvider>{children}</TanstackProvider>
         </ThemeProvider>
+
+        <ThirdPartyScripts />
       </body>
     </html>
   );

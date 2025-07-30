@@ -87,11 +87,13 @@ export async function handleUserAuth(complete: (userInfo?: any) => void) {
   console.log("\n----------[接入方网页免登处理 BEGIN]----------");
 
   // 检查是否有存储的token
-  let lj_tokenString = Cookies.get(LJ_TOKEN_KEY) || "";
+  // let lj_tokenString = Cookies.get(LJ_TOKEN_KEY) || "";
+  let lj_tokenString = "";
 
   if (lj_tokenString.length > 0) {
     console.log("接入方前端[免登处理]第① 步: 用户已登录，请求后端验证...");
-    requestUserAccessToken("", complete);
+
+    requestUserAccessToken(lj_tokenString, complete);
   } else {
     if (!window.h5sdk) {
       console.log("invalid h5sdk");
@@ -108,6 +110,7 @@ export async function handleUserAuth(complete: (userInfo?: any) => void) {
         appId: feishuConfig.appId,
         success: (info: any) => {
           const code = info.code;
+          console.log("code", code);
           if (code.length <= 0) {
             console.error("auth code为空");
             complete();

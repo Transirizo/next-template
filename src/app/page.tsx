@@ -20,17 +20,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="home">
+    <div className="min-h-screen p-5 bg-gray-100">
       <UserInfo userInfo={userInfo} />
       <UseAPI />
-      
-      <style jsx>{`
-        .home {
-          min-height: 100vh;
-          padding: 20px;
-          background-color: #f5f5f5;
-        }
-      `}</style>
     </div>
   );
 }
