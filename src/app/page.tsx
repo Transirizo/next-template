@@ -7,11 +7,20 @@ import AssetList from "@/components/AssetList";
 import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
 import { User } from "@/types/asset";
 import { useAssets } from "@/hooks/useAssets";
+import { useUser } from "@/hooks/useUser";
+import axios from "axios";
+import { err } from "@/lib/http-utils/response";
 
 export default function Home() {
-  const [userInfo, setUserInfo] = useState<any>({});
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const {
+    userInfo: globalUserInfo,
+    isAuthenticated,
+    isLoading: globalIsLoading,
+    setUser: setGlobalUser,
+    setLoading: setGlobalLoading,
+  } = useUser();
   const [searchParams, setSearchParams] = useState<{
     search?: string;
     status?: string;
@@ -25,15 +34,39 @@ export default function Home() {
   const assets = assetsResponse?.data || [];
 
   useEffect(() => {
-    // 鉴权处理
+    init();
+  }, [isAuthenticated, globalUserInfo, setGlobalUser, setGlobalLoading]);
+
+  const init = async () => {
+    await login();
+    await getData();
+  };
+
+  const login = async () => {
+    // 如果全局状态中已有用户信息，直接使用，无需重新鉴权
+
+    if (isAuthenticated && globalUserInfo) {
+      console.log("用户已登录，使用全局状态:", globalUserInfo);
+      const systemUser: User = {
+        id: globalUserInfo.open_id || "unknown",
+        name: globalUserInfo.name || "未知用户",
+        avatar_url: globalUserInfo.avatar_url,
+        role: "editor", // 默认为编辑权限
+      };
+      setUser(systemUser);
+      setIsLoading(false);
+      return;
+    }
+
+    // 如果没有用户信息，进行鉴权处理
+    setGlobalLoading(true);
+    console.log("用户未登录，开始鉴权流程");
     handleJSAPIAccess((isSuccess) => {
       console.log("JSAPI鉴权结果:", isSuccess);
       if (isSuccess) {
         // 免登处理
         handleUserAuth((authUserInfo) => {
           console.log("用户认证信息:", authUserInfo);
-          setUserInfo(authUserInfo || {});
-
           // 转换为系统用户格式
           if (authUserInfo) {
             const systemUser: User = {
@@ -44,6 +77,11 @@ export default function Home() {
               access_token: authUserInfo.access_token,
             };
             setUser(systemUser);
+            console.log(authUserInfo, "authUserInfo");
+            // 🎯 关键：设置全局用户状态
+            setGlobalUser({
+              ...authUserInfo,
+            });
           } else {
             // 如果没有用户信息，创建默认用户（开发环境）
             const defaultUser: User = {
@@ -52,8 +90,15 @@ export default function Home() {
               role: "admin",
             };
             setUser(defaultUser);
+
+            // 设置默认用户到全局状态
+            setGlobalUser({
+              name: "开发用户",
+              open_id: "dev-user",
+            });
           }
           setIsLoading(false);
+          setGlobalLoading(false);
         });
       } else {
         // 鉴权失败，使用默认用户（开发环境）
@@ -64,13 +109,43 @@ export default function Home() {
           role: "admin",
         };
         setUser(defaultUser);
+
+        // 设置默认用户到全局状态
+        setGlobalUser({
+          name: "开发用户",
+          open_id: "dev-user",
+        });
+
         setIsLoading(false);
+        setGlobalLoading(false);
       }
     });
-  }, []);
+  };
+  const getData = async () => {
+    try {
+      // The user's token, which will be passed to your backend
+      const accessToken = globalUserInfo?.access_token;
 
-  const handleAssetClick = (asset: any) => {
-    router.push(`/assets/${asset.id}`);
+      // Call YOUR backend endpoint, not Feishu's
+      const response = await axios.post(
+        "/api/getAssets", // This is your new local API route
+        {}, // You can pass a body here if needed by your backend
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log("Data from Feishu:", response.data.data.items);
+      return response.data.data.items;
+    } catch (error) {
+      console.error("Failed to get data:", error);
+    }
+  };
+  const handleAssetClick = (asset: unknown) => {
+    const assetWithId = asset as { id: string };
+    router.push(`/assets/${assetWithId.id}`);
   };
 
   const handleAddAsset = () => {
@@ -81,7 +156,7 @@ export default function Home() {
     router.push("/scan");
   };
 
-  if (isLoading || isLoadingAssets) {
+  if (isLoading || isLoadingAssets || globalIsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -106,11 +181,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 用户信息头部 */}
-      {userInfo && Object.keys(userInfo).length > 0 && (
-        <div className="bg-white border-b">
-          <UserInfo userInfo={userInfo} />
-        </div>
-      )}
+      <div className="bg-white border-b">
+        <UserInfo />
+      </div>
 
       {/* 资产列表页面 */}
       <AssetList

@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
-import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
-import { User } from "@/types/asset";
 import { useAssetByCode } from "@/hooks/useAssets";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useUser } from "@/hooks/useUser";
 
 export default function ScanResultPage() {
   const params = useParams();
@@ -17,59 +16,11 @@ export default function ScanResultPage() {
 
   const assetCode = decodeURIComponent(params.code as string);
   const error = searchParams.get("error");
-
-  const [userInfo, setUserInfo] = useState<any>({});
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { userInfo, isAuthenticated, isLoading } = useUser();
   const [retryCount, setRetryCount] = useState(0);
 
   // 重试查询资产
   const { mutateAsync: getAssetByCode, isPending: isSearching } = useAssetByCode();
-
-  useEffect(() => {
-    // 鉴权处理
-    handleJSAPIAccess((isSuccess) => {
-      console.log("JSAPI鉴权结果:", isSuccess);
-      if (isSuccess) {
-        // 免登处理
-        handleUserAuth((authUserInfo) => {
-          console.log("用户认证信息:", authUserInfo);
-          setUserInfo(authUserInfo || {});
-
-          // 转换为系统用户格式
-          if (authUserInfo) {
-            const systemUser: User = {
-              id: authUserInfo.open_id || "unknown",
-              name: authUserInfo.name || "未知用户",
-              avatar_url: authUserInfo.avatar_url,
-              role: "editor", // 默认为编辑权限，实际应该从后端获取
-              access_token: authUserInfo.access_token,
-            };
-            setUser(systemUser);
-          } else {
-            // 如果没有用户信息，创建默认用户（开发环境）
-            const defaultUser: User = {
-              id: "dev-user",
-              name: "开发用户",
-              role: "admin",
-            };
-            setUser(defaultUser);
-          }
-          setIsLoading(false);
-        });
-      } else {
-        // 鉴权失败，使用默认用户（开发环境）
-        console.log("鉴权失败，使用默认用户");
-        const defaultUser: User = {
-          id: "dev-user",
-          name: "开发用户",
-          role: "admin",
-        };
-        setUser(defaultUser);
-        setIsLoading(false);
-      }
-    });
-  }, []);
 
   const handleRetry = async () => {
     try {
@@ -82,21 +33,22 @@ export default function ScanResultPage() {
       } else {
         toast.error(response.error || "仍未找到该资产");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '查询失败';
       console.error("重试查询失败:", error);
-      toast.error(error.message || "查询失败，请重试");
+      toast.error(errorMessage || "查询失败，请重试");
     }
   };
 
   const handleCreateAsset = () => {
-    // 如果是管理员且是空白码，可以创建新资产
-    if (user?.role === "admin") {
+    // 如果用户已登录且是空白码，可以创建新资产
+    if (isAuthenticated) {
       router.push("/addAsset");
     }
   };
 
   const isBlankCode = assetCode.startsWith("BLANK_") || assetCode.includes("blank");
-  const canCreateAsset = user?.role === "admin" && isBlankCode;
+  const canCreateAsset = isAuthenticated && isBlankCode;
 
   if (isLoading) {
     return (
@@ -109,12 +61,15 @@ export default function ScanResultPage() {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">登录失败</h2>
-          <p className="text-gray-600">请在飞书环境中访问此应用</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">未登录</h2>
+          <p className="text-gray-600 mb-4">请先登录后再查看扫码结果</p>
+          <Link href="/" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            返回首页
+          </Link>
         </div>
       </div>
     );
@@ -123,11 +78,9 @@ export default function ScanResultPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 用户信息头部 */}
-      {userInfo && Object.keys(userInfo).length > 0 && (
-        <div className="bg-white border-b">
-          <UserInfo userInfo={userInfo} />
-        </div>
-      )}
+      <div className="bg-white border-b">
+        <UserInfo />
+      </div>
 
       {/* 扫码结果页面 */}
       <div className="p-4">

@@ -4,6 +4,7 @@ import { TanstackProvider } from "@/lib/tanstack-query/tanstack-provider";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/lib/theme-provider/theme-provider";
 import { ThirdPartyScripts } from "@/lib/third-party-scripts/third-party-scripts";
+import { UserProvider } from "@/lib/user-context/user-context";
 export const metadata: Metadata = {
   icons: {
     icon: "/icon/logo.svg",
@@ -27,8 +28,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster />
-          <TanstackProvider>{children}</TanstackProvider>
+          <UserProvider>
+            <Toaster />
+            <TanstackProvider>{children}</TanstackProvider>
+          </UserProvider>
         </ThemeProvider>
         <ThirdPartyScripts />
       </body>

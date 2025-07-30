@@ -1,22 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
 import AssetForm from "@/components/AssetForm";
-import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
 import { User, AssetFormData } from "@/types/asset";
 import { useAsset, useUpdateAsset } from "@/hooks/useAssets";
+import { useUser } from "@/hooks/useUser";
 
 export default function AssetEditPage() {
   const params = useParams();
   const router = useRouter();
   const assetId = params.id as string;
-
-  const [userInfo, setUserInfo] = useState<any>({});
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { userInfo, isAuthenticated, isLoading } = useUser();
 
   // 获取资产详情
   const { data: assetResponse, isLoading: isLoadingAsset, error } = useAsset(assetId);
@@ -25,54 +21,17 @@ export default function AssetEditPage() {
   // 更新资产
   const { mutateAsync: updateAsset, isPending: isUpdating } = useUpdateAsset();
 
-  useEffect(() => {
-    // 鉴权处理
-    handleJSAPIAccess((isSuccess) => {
-      console.log("JSAPI鉴权结果:", isSuccess);
-      if (isSuccess) {
-        // 免登处理
-        handleUserAuth((authUserInfo) => {
-          console.log("用户认证信息:", authUserInfo);
-          setUserInfo(authUserInfo || {});
-
-          // 转换为系统用户格式
-          if (authUserInfo) {
-            const systemUser: User = {
-              id: authUserInfo.open_id || "unknown",
-              name: authUserInfo.name || "未知用户",
-              avatar_url: authUserInfo.avatar_url,
-              role: "editor", // 默认为编辑权限，实际应该从后端获取
-              access_token: authUserInfo.access_token,
-            };
-            setUser(systemUser);
-          } else {
-            // 如果没有用户信息，创建默认用户（开发环境）
-            const defaultUser: User = {
-              id: "dev-user",
-              name: "开发用户",
-              role: "admin",
-            };
-            setUser(defaultUser);
-          }
-          setIsLoading(false);
-        });
-      } else {
-        // 鉴权失败，使用默认用户（开发环境）
-        console.log("鉴权失败，使用默认用户");
-        const defaultUser: User = {
-          id: "dev-user",
-          name: "开发用户",
-          role: "admin",
-        };
-        setUser(defaultUser);
-        setIsLoading(false);
-      }
-    });
-  }, []);
+  // 创建用户对象用于传递给组件
+  const user: User = {
+    id: userInfo?.open_id || "unknown",
+    name: userInfo?.name || "未知用户",
+    avatar_url: userInfo?.avatar_url,
+    role: "editor", // 默认为编辑权限
+  };
 
   const handleSave = async (formData: AssetFormData): Promise<void> => {
     try {
-      const response = await updateAsset({
+      await updateAsset({
         id: assetId,
         data: formData,
       });
@@ -117,25 +76,12 @@ export default function AssetEditPage() {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">登录失败</h2>
-          <p className="text-gray-600">请在飞书环境中访问此应用</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 权限检查
-  const canEdit = user.role === "admin" || user.role === "editor";
-  if (!canEdit) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">权限不足</h2>
-          <p className="text-gray-600 mb-4">您没有编辑资产的权限</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">未登录</h2>
+          <p className="text-gray-600 mb-4">请先登录后再编辑资产</p>
           <Link
             href={`/assets/${assetId}`}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -150,11 +96,9 @@ export default function AssetEditPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 用户信息头部 */}
-      {userInfo && Object.keys(userInfo).length > 0 && (
-        <div className="bg-white border-b">
-          <UserInfo userInfo={userInfo} />
-        </div>
-      )}
+      <div className="bg-white border-b">
+        <UserInfo />
+      </div>
 
       {/* 资产编辑表单 */}
       <AssetForm
