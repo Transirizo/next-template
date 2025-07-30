@@ -30,7 +30,6 @@ export default function RootLayout({
           <Toaster />
           <TanstackProvider>{children}</TanstackProvider>
         </ThemeProvider>
-
         <ThirdPartyScripts />
       </body>
     </html>

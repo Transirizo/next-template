@@ -1,28 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
-import AssetList from "@/components/AssetList";
+import AssetDetail from "@/components/AssetDetail";
 import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
 import { User } from "@/types/asset";
-import { useAssets } from "@/hooks/useAssets";
+import { useAsset } from "@/hooks/useAssets";
 
-export default function Home() {
+export default function AssetDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const assetId = params.id as string;
+
   const [userInfo, setUserInfo] = useState<any>({});
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchParams, setSearchParams] = useState<{
-    search?: string;
-    status?: string;
-    category?: string;
-  }>({});
 
-  const router = useRouter();
-
-  // API hooks
-  const { data: assetsResponse, isLoading: isLoadingAssets } = useAssets(searchParams);
-  const assets = assetsResponse?.data || [];
+  // 获取资产详情
+  const { data: assetResponse, isLoading: isLoadingAsset, error } = useAsset(assetId);
+  const asset = assetResponse?.data;
 
   useEffect(() => {
     // 鉴权处理
@@ -69,24 +67,37 @@ export default function Home() {
     });
   }, []);
 
-  const handleAssetClick = (asset: any) => {
-    router.push(`/assets/${asset.id}`);
+  const handleEdit = () => {
+    router.push(`/assets/${assetId}/edit`);
   };
 
-  const handleAddAsset = () => {
-    router.push("/addAsset");
+  const handleBack = () => {
+    router.push("/");
   };
 
-  const handleScanQR = () => {
-    router.push("/scan");
-  };
-
-  if (isLoading || isLoadingAssets) {
+  if (isLoading || isLoadingAsset) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">正在加载...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !asset) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">资产不存在</h2>
+          <p className="text-gray-600 mb-4">找不到该资产信息</p>
+          <Link
+            href="/"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            返回首页
+          </Link>
         </div>
       </div>
     );
@@ -112,15 +123,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* 资产列表页面 */}
-      <AssetList
-        assets={assets}
-        user={user}
-        onAssetClick={handleAssetClick}
-        onAddAsset={user.role === "admin" ? handleAddAsset : undefined}
-        onScanQR={handleScanQR}
-        onSearch={setSearchParams}
-      />
+      {/* 资产详情页面 */}
+      <AssetDetail asset={asset} user={user} onEdit={handleEdit} onBack={handleBack} />
     </div>
   );
 }

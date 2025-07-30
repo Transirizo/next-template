@@ -1,28 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
-import AssetList from "@/components/AssetList";
+import AssetForm from "@/components/AssetForm";
 import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
-import { User } from "@/types/asset";
-import { useAssets } from "@/hooks/useAssets";
+import { User, AssetFormData } from "@/types/asset";
+import { useAsset, useUpdateAsset } from "@/hooks/useAssets";
 
-export default function Home() {
+export default function AssetEditPage() {
+  const params = useParams();
+  const router = useRouter();
+  const assetId = params.id as string;
+
   const [userInfo, setUserInfo] = useState<any>({});
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchParams, setSearchParams] = useState<{
-    search?: string;
-    status?: string;
-    category?: string;
-  }>({});
 
-  const router = useRouter();
+  // 获取资产详情
+  const { data: assetResponse, isLoading: isLoadingAsset, error } = useAsset(assetId);
+  const asset = assetResponse?.data;
 
-  // API hooks
-  const { data: assetsResponse, isLoading: isLoadingAssets } = useAssets(searchParams);
-  const assets = assetsResponse?.data || [];
+  // 更新资产
+  const { mutateAsync: updateAsset, isPending: isUpdating } = useUpdateAsset();
 
   useEffect(() => {
     // 鉴权处理
@@ -69,24 +70,48 @@ export default function Home() {
     });
   }, []);
 
-  const handleAssetClick = (asset: any) => {
-    router.push(`/assets/${asset.id}`);
+  const handleSave = async (formData: AssetFormData): Promise<void> => {
+    try {
+      const response = await updateAsset({
+        id: assetId,
+        data: formData,
+      });
+
+      // 成功后跳转到详情页
+      router.push(`/assets/${assetId}`);
+    } catch (error) {
+      console.error("更新资产失败:", error);
+      throw error;
+    }
   };
 
-  const handleAddAsset = () => {
-    router.push("/addAsset");
+  const handleCancel = () => {
+    router.push(`/assets/${assetId}`);
   };
 
-  const handleScanQR = () => {
-    router.push("/scan");
-  };
-
-  if (isLoading || isLoadingAssets) {
+  if (isLoading || isLoadingAsset) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">正在加载...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !asset) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">资产不存在</h2>
+          <p className="text-gray-600 mb-4">找不到该资产信息</p>
+          <Link
+            href="/"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            返回首页
+          </Link>
         </div>
       </div>
     );
@@ -103,6 +128,25 @@ export default function Home() {
     );
   }
 
+  // 权限检查
+  const canEdit = user.role === "admin" || user.role === "editor";
+  if (!canEdit) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">权限不足</h2>
+          <p className="text-gray-600 mb-4">您没有编辑资产的权限</p>
+          <Link
+            href={`/assets/${assetId}`}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            返回详情页
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 用户信息头部 */}
@@ -112,14 +156,12 @@ export default function Home() {
         </div>
       )}
 
-      {/* 资产列表页面 */}
-      <AssetList
-        assets={assets}
-        user={user}
-        onAssetClick={handleAssetClick}
-        onAddAsset={user.role === "admin" ? handleAddAsset : undefined}
-        onScanQR={handleScanQR}
-        onSearch={setSearchParams}
+      {/* 资产编辑表单 */}
+      <AssetForm
+        asset={asset}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        isSubmitting={isUpdating}
       />
     </div>
   );

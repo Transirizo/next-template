@@ -2,27 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
-import AssetList from "@/components/AssetList";
+import QRScanner from "@/components/QRScanner";
 import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
 import { User } from "@/types/asset";
-import { useAssets } from "@/hooks/useAssets";
+import { useAssetByCode } from "@/hooks/useAssets";
+import { toast } from "sonner";
 
-export default function Home() {
+export default function ScanPage() {
+  const router = useRouter();
   const [userInfo, setUserInfo] = useState<any>({});
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchParams, setSearchParams] = useState<{
-    search?: string;
-    status?: string;
-    category?: string;
-  }>({});
 
-  const router = useRouter();
-
-  // API hooks
-  const { data: assetsResponse, isLoading: isLoadingAssets } = useAssets(searchParams);
-  const assets = assetsResponse?.data || [];
+  // 根据资产编码获取资产
+  const { mutateAsync: getAssetByCode, isPending: isScanning } = useAssetByCode();
 
   useEffect(() => {
     // 鉴权处理
@@ -69,19 +64,36 @@ export default function Home() {
     });
   }, []);
 
-  const handleAssetClick = (asset: any) => {
-    router.push(`/assets/${asset.id}`);
+  const handleScanSuccess = async (assetCode: string) => {
+    try {
+      const response = await getAssetByCode(assetCode);
+      if (response.success && response.data) {
+        // 跳转到资产详情页
+        router.push(`/assets/${response.data.id}`);
+        toast.success(response.message || `找到资产: ${response.data.assetName}`);
+      } else {
+        // 跳转到扫码结果页，显示未找到的信息
+        router.push(`/scan/result/${encodeURIComponent(assetCode)}`);
+        toast.error(response.error || "未找到该资产，请联系管理员");
+      }
+    } catch (error: any) {
+      console.error("查询资产失败:", error);
+      // 跳转到扫码结果页，显示错误信息
+      router.push(
+        `/scan/result/${encodeURIComponent(assetCode)}?error=${encodeURIComponent(
+          error.message || "查询失败"
+        )}`
+      );
+      toast.error(error.message || "查询资产失败，请重试");
+    }
   };
 
-  const handleAddAsset = () => {
-    router.push("/addAsset");
+  const handleScanError = (error: string) => {
+    console.error("扫码错误:", error);
+    toast.error("扫码失败，请重试");
   };
 
-  const handleScanQR = () => {
-    router.push("/scan");
-  };
-
-  if (isLoading || isLoadingAssets) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -112,15 +124,31 @@ export default function Home() {
         </div>
       )}
 
-      {/* 资产列表页面 */}
-      <AssetList
-        assets={assets}
-        user={user}
-        onAssetClick={handleAssetClick}
-        onAddAsset={user.role === "admin" ? handleAddAsset : undefined}
-        onScanQR={handleScanQR}
-        onSearch={setSearchParams}
-      />
+      {/* 扫码页面 */}
+      <div className="p-4">
+        <div className="max-w-md mx-auto">
+          {/* Header */}
+          <div className="flex items-center mb-6">
+            <Link href="/" className="mr-4 p-2 text-gray-600 hover:text-gray-800">
+              ← 返回
+            </Link>
+            <h1 className="text-xl font-bold text-gray-900">扫描资产</h1>
+          </div>
+
+          {/* QR Scanner Component */}
+          <QRScanner onScanSuccess={handleScanSuccess} onScanError={handleScanError} />
+
+          {/* 额外提示信息 */}
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-sm font-medium text-blue-900 mb-2">扫码说明</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• 扫码后将自动跳转到资产详情页</li>
+              <li>• 如果资产不存在，将显示相关提示</li>
+              <li>• 管理员可以为空白二维码绑定新资产</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,27 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
-import AssetList from "@/components/AssetList";
+import AssetForm from "@/components/AssetForm";
 import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
-import { User } from "@/types/asset";
-import { useAssets } from "@/hooks/useAssets";
+import { User, AssetFormData } from "@/types/asset";
+import { useCreateAsset } from "@/hooks/useAssets";
 
-export default function Home() {
+export default function AddAsset() {
+  const router = useRouter();
   const [userInfo, setUserInfo] = useState<any>({});
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchParams, setSearchParams] = useState<{
-    search?: string;
-    status?: string;
-    category?: string;
-  }>({});
 
-  const router = useRouter();
-
-  // API hooks
-  const { data: assetsResponse, isLoading: isLoadingAssets } = useAssets(searchParams);
-  const assets = assetsResponse?.data || [];
+  // 创建资产
+  const { mutateAsync: createAsset, isPending: isCreating } = useCreateAsset();
 
   useEffect(() => {
     // 鉴权处理
@@ -69,19 +63,28 @@ export default function Home() {
     });
   }, []);
 
-  const handleAssetClick = (asset: any) => {
-    router.push(`/assets/${asset.id}`);
+  const handleSave = async (formData: AssetFormData): Promise<void> => {
+    try {
+      const response = await createAsset(formData);
+
+      // 成功后跳转到新创建的资产详情页
+      if (response.data) {
+        router.push(`/assets/${response.data.id}`);
+      } else {
+        // 如果没有返回ID，跳转到首页
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("创建资产失败:", error);
+      throw error;
+    }
   };
 
-  const handleAddAsset = () => {
-    router.push("/addAsset");
+  const handleCancel = () => {
+    router.push("/");
   };
 
-  const handleScanQR = () => {
-    router.push("/scan");
-  };
-
-  if (isLoading || isLoadingAssets) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -103,6 +106,25 @@ export default function Home() {
     );
   }
 
+  // 权限检查
+  const canAdd = user.role === "admin";
+  if (!canAdd) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">权限不足</h2>
+          <p className="text-gray-600 mb-4">您没有创建资产的权限</p>
+          <Link
+            href="/"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            返回首页
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 用户信息头部 */}
@@ -112,15 +134,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* 资产列表页面 */}
-      <AssetList
-        assets={assets}
-        user={user}
-        onAssetClick={handleAssetClick}
-        onAddAsset={user.role === "admin" ? handleAddAsset : undefined}
-        onScanQR={handleScanQR}
-        onSearch={setSearchParams}
-      />
+      {/* 新增资产表单 */}
+      <AssetForm onSave={handleSave} onCancel={handleCancel} isSubmitting={isCreating} />
     </div>
   );
 }

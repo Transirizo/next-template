@@ -8,14 +8,14 @@
 
 ### 1. 用户认证流程
 
-- **原路径**: `/api/get_user_access_token`
-- **新路径**: `/api/feishu/get_user_access_token`
+- **原路径**: `/api/getUserAccessToken`
+- **新路径**: `/api/feishu/getUserAccessToken`
 - **功能**: 处理飞书免登录，获取用户授权令牌
 
 ### 2. JSAPI 签名参数
 
-- **原路径**: `/api/get_sign_parameters`
-- **新路径**: `/api/feishu/get_sign_parameters`
+- **原路径**: `/api/getSignParameters`
+- **新路径**: `/api/feishu/getSignParameters`
 - **功能**: 生成 JSAPI 鉴权参数
 
 ### 3. 测试端点
@@ -28,7 +28,7 @@
 ### 获取用户访问令牌
 
 ```bash
-GET /api/feishu/get_user_access_token?code=YOUR_AUTH_CODE
+GET /api/feishu/getUserAccessToken?code=YOUR_AUTH_CODE
 ```
 
 **响应格式:**
@@ -51,7 +51,7 @@ GET /api/feishu/get_user_access_token?code=YOUR_AUTH_CODE
 ### 获取签名参数
 
 ```bash
-GET /api/feishu/get_sign_parameters?url=YOUR_PAGE_URL
+GET /api/feishu/getSignParameters?url=YOUR_PAGE_URL
 ```
 
 **响应格式:**
@@ -87,8 +87,8 @@ src/
 │   ├── auth.ts            # 认证相关API调用
 │   └── session.ts         # 会话管理
 └── app/api/feishu/
-    ├── get_user_access_token/route.ts
-    ├── get_sign_parameters/route.ts
+    ├── getUserAccessToken/route.ts
+    ├── getSignParameters/route.ts
     └── test/route.ts
 ```
 
