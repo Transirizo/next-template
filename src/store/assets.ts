@@ -1,6 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./store";
 import { Asset } from "@/types/asset";
+import axios from "axios";
 
 interface AssetsState {
   assets: Asset[];
@@ -14,6 +15,34 @@ const initialState: AssetsState = {
   loading: false,
   error: null,
 };
+
+// 异步 thunk 获取资产数据
+export const fetchAssets = createAsyncThunk(
+  'assets/fetchAssets',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const accessToken = state.user.userInfo?.access_token;
+      
+      const response = await axios.post(
+        "/api/getAssets",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      
+      console.log("Assets response:", response.data);
+      const assetsData = response.data.data || [];
+      return assetsData;
+    } catch (error: any) {
+      console.error("Failed to get assets:", error);
+      return rejectWithValue("获取资产数据失败");
+    }
+  }
+);
 
 export const assetsSlice = createSlice({
   name: "assets",
@@ -32,6 +61,22 @@ export const assetsSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAssets.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAssets.fulfilled, (state, action) => {
+        state.assets = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchAssets.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string || "获取资产数据失败";
+      });
   },
 });
 

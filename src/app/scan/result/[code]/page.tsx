@@ -6,7 +6,8 @@ import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useUser } from "@/hooks/useUser";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import { selectUser, selectIsAuthenticated, selectUserLoading } from "@/store/user";
 
 export default function ScanResultPage() {
   const params = useParams();
@@ -15,7 +16,9 @@ export default function ScanResultPage() {
 
   const assetCode = decodeURIComponent(params.code as string);
   const error = searchParams.get("error");
-  const { userInfo, isAuthenticated, isLoading } = useUser();
+  const userInfo = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isLoading = useAppSelector(selectUserLoading);
   const [retryCount, setRetryCount] = useState(0);
 
   const isSearching = false;

@@ -2,10 +2,13 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { useUser } from "@/hooks/useUser";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import { selectUser, selectIsAuthenticated, selectUserLoading } from "@/store/user";
 
 export default function UserInfo() {
-  const { userInfo, isAuthenticated, isLoading } = useUser();
+  const userInfo = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isLoading = useAppSelector(selectUserLoading);
   const [logoSrc, setLogoSrc] = useState("/logo.svg");
 
   if (isLoading) {

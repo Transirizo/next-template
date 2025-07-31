@@ -5,11 +5,13 @@ import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
 import QRScanner from "@/components/QRScanner";
 import { toast } from "sonner";
-import { useUser } from "@/hooks/useUser";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import { selectIsAuthenticated, selectUserLoading } from "@/store/user";
 
 export default function ScanPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useUser();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isLoading = useAppSelector(selectUserLoading);
 
   const handleScanSuccess = async (assetCode: string) => {
     toast.error("扫码查询功能暂不可用");

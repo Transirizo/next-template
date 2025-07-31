@@ -4,7 +4,6 @@ import { TanstackProvider } from "@/lib/tanstack-query/tanstack-provider";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/lib/theme-provider/theme-provider";
 import { ThirdPartyScripts } from "@/lib/third-party-scripts/third-party-scripts";
-import { UserProvider } from "@/lib/user-context/user-context";
 import { ReduxProvider } from "@/lib/redux-provider/redux-provider";
 export const metadata: Metadata = {
   icons: {
@@ -30,10 +29,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReduxProvider>
-            <UserProvider>
-              <Toaster />
-              <TanstackProvider>{children}</TanstackProvider>
-            </UserProvider>
+            <Toaster />
+            <TanstackProvider>{children}</TanstackProvider>
           </ReduxProvider>
         </ThemeProvider>
         <ThirdPartyScripts />

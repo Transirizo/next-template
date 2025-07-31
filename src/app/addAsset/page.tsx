@@ -5,11 +5,14 @@ import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
 import AssetForm from "@/components/AssetForm";
 import { AssetFormData } from "@/types/asset";
-import { useUser } from "@/hooks/useUser";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import { selectUser, selectIsAuthenticated, selectUserLoading } from "@/store/user";
 
 export default function AddAsset() {
   const router = useRouter();
-  const { userInfo, isAuthenticated, isLoading } = useUser();
+  const userInfo = useAppSelector(selectUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isLoading = useAppSelector(selectUserLoading);
 
   const isCreating = false;
 
