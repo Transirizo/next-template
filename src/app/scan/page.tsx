@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
 import QRScanner from "@/components/QRScanner";
-import { useAssetByCode } from "@/hooks/useAssets";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
 
@@ -12,30 +11,10 @@ export default function ScanPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useUser();
 
-  // 根据资产编码获取资产
-  const { mutateAsync: getAssetByCode } = useAssetByCode();
-
   const handleScanSuccess = async (assetCode: string) => {
-    try {
-      const response = await getAssetByCode(assetCode);
-      if (response.success && response.data) {
-        // 跳转到资产详情页
-        router.push(`/assets/${response.data.id}`);
-        toast.success(response.message || `找到资产: ${response.data.assetName}`);
-      } else {
-        // 跳转到扫码结果页，显示未找到的信息
-        router.push(`/scan/result/${encodeURIComponent(assetCode)}`);
-        toast.error(response.error || "未找到该资产，请联系管理员");
-      }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '查询失败';
-      console.error("查询资产失败:", error);
-      // 跳转到扫码结果页，显示错误信息
-      router.push(
-        `/scan/result/${encodeURIComponent(assetCode)}?error=${encodeURIComponent(errorMessage)}`
-      );
-      toast.error(errorMessage || "查询资产失败，请重试");
-    }
+    toast.error("扫码查询功能暂不可用");
+    // 跳转到扫码结果页，显示未找到的信息
+    router.push(`/scan/result/${encodeURIComponent(assetCode)}`);
   };
 
   const handleScanError = (error: string) => {

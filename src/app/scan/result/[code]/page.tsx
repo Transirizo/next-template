@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
-import { useAssetByCode } from "@/hooks/useAssets";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
@@ -19,25 +18,11 @@ export default function ScanResultPage() {
   const { userInfo, isAuthenticated, isLoading } = useUser();
   const [retryCount, setRetryCount] = useState(0);
 
-  // 重试查询资产
-  const { mutateAsync: getAssetByCode, isPending: isSearching } = useAssetByCode();
+  const isSearching = false;
 
   const handleRetry = async () => {
-    try {
-      setRetryCount((prev) => prev + 1);
-      const response = await getAssetByCode(assetCode);
-      if (response.success && response.data) {
-        // 找到资产，跳转到详情页
-        router.push(`/assets/${response.data.id}`);
-        toast.success(response.message || `找到资产: ${response.data.assetName}`);
-      } else {
-        toast.error(response.error || "仍未找到该资产");
-      }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '查询失败';
-      console.error("重试查询失败:", error);
-      toast.error(errorMessage || "查询失败，请重试");
-    }
+    setRetryCount((prev) => prev + 1);
+    toast.error("查询功能暂不可用");
   };
 
   const handleCreateAsset = () => {

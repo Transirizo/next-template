@@ -6,7 +6,6 @@ import AssetDetail from "./AssetDetail";
 import AssetForm from "./AssetForm";
 import QRScanner from "./QRScanner";
 import { Asset, User, AssetFormData } from "@/types/asset";
-import { useAssets, useAssetByCode, useCreateAsset, useUpdateAsset } from "@/hooks/useAssets";
 import { toast } from "sonner";
 
 interface AssetManagementProps {
@@ -24,14 +23,8 @@ export default function AssetManagement({ user }: AssetManagementProps) {
     category?: string;
   }>({});
 
-  // API hooks
-  const { data: assetsResponse, isLoading: isLoadingAssets, error } = useAssets(searchParams);
-  const { mutateAsync: getAssetByCode, isPending: isScanning } = useAssetByCode();
-  const { mutateAsync: createAsset, isPending: isCreating } = useCreateAsset();
-  const { mutateAsync: updateAsset, isPending: isUpdating } = useUpdateAsset();
-
-  const assets = assetsResponse?.data || [];
-  const isLoading = isLoadingAssets || isScanning || isCreating || isUpdating;
+  const assets = [];
+  const isLoading = false;
 
   const handleAssetClick = (asset: Asset) => {
     setCurrentAsset(asset);
@@ -39,52 +32,12 @@ export default function AssetManagement({ user }: AssetManagementProps) {
   };
 
   const handleScanSuccess = async (assetCode: string) => {
-    try {
-      const response = await getAssetByCode(assetCode);
-      if (response.success && response.data) {
-        setCurrentAsset(response.data);
-        setViewMode("detail");
-        toast.success(response.message || `找到资产: ${response.data.assetName}`);
-      } else {
-        toast.error(response.error || "未找到该资产，请联系管理员");
-        // 如果是空白码且用户是管理员，可以创建新资产
-        if (user.role === "admin" && assetCode.startsWith("BLANK_")) {
-          setViewMode("add");
-          toast.info("检测到空白二维码，可以绑定新资产");
-        }
-      }
-    } catch (error: any) {
-      console.error("查询资产失败:", error);
-      toast.error(error.message || "查询资产失败，请重试");
-    }
+    toast.error("扫码功能暂不可用");
   };
 
   const handleSaveAsset = async (formData: AssetFormData): Promise<void> => {
-    try {
-      let response;
-
-      if (currentAsset) {
-        // 更新现有资产
-        response = await updateAsset({
-          id: currentAsset.id,
-          data: formData,
-        });
-        if (response.data) {
-          setCurrentAsset(response.data);
-          setViewMode("detail");
-        }
-      } else {
-        // 创建新资产
-        response = await createAsset(formData);
-        if (response.data) {
-          setCurrentAsset(response.data);
-          setViewMode("detail");
-        }
-      }
-    } catch (error) {
-      console.error("保存资产失败:", error);
-      throw error;
-    }
+    toast.error("保存功能暂不可用");
+    throw new Error("保存功能暂不可用");
   };
 
   const handleBackToList = () => {

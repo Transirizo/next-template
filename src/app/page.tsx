@@ -6,14 +6,17 @@ import UserInfo from "@/components/UserInfo";
 import AssetList from "@/components/AssetList";
 import { handleJSAPIAccess, handleUserAuth } from "@/lib/feishu-auth";
 import { User } from "@/types/asset";
-import { useAssets } from "@/hooks/useAssets";
 import { useUser } from "@/hooks/useUser";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { setAssets, setLoading, setError, selectAssets, selectAssetsLoading } from "@/store/assets";
 import axios from "axios";
-import { err } from "@/lib/http-utils/response";
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const assets = useAppSelector(selectAssets);
+  const assetsLoading = useAppSelector(selectAssetsLoading);
   const {
     userInfo: globalUserInfo,
     isAuthenticated,
@@ -29,10 +32,6 @@ export default function Home() {
 
   const router = useRouter();
 
-  // API hooks
-  const { data: assetsResponse, isLoading: isLoadingAssets } = useAssets(searchParams);
-  const assets = assetsResponse?.data || [];
-
   useEffect(() => {
     init();
   }, [isAuthenticated, globalUserInfo, setGlobalUser, setGlobalLoading]);
@@ -44,7 +43,6 @@ export default function Home() {
 
   const login = async () => {
     // 如果全局状态中已有用户信息，直接使用，无需重新鉴权
-
     if (isAuthenticated && globalUserInfo) {
       console.log("用户已登录，使用全局状态:", globalUserInfo);
       const systemUser: User = {
@@ -121,28 +119,30 @@ export default function Home() {
       }
     });
   };
+
   const getData = async () => {
     try {
-      // The user's token, which will be passed to your backend
+      dispatch(setLoading(true));
       const accessToken = globalUserInfo?.access_token;
-
-      // Call YOUR backend endpoint, not Feishu's
       const response = await axios.post(
-        "/api/getAssets", // This is your new local API route
-        {}, // You can pass a body here if needed by your backend
+        "/api/getAssets",
+        {},
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }
       );
-
-      console.log("Data from Feishu:", response.data.data.items);
-      return response.data.data.items;
+      console.log(response.data);
+      const assetsData = response.data.data || [];
+      dispatch(setAssets(assetsData));
+      return assetsData;
     } catch (error) {
       console.error("Failed to get data:", error);
+      dispatch(setError("获取资产数据失败"));
     }
   };
+
   const handleAssetClick = (asset: unknown) => {
     const assetWithId = asset as { id: string };
     router.push(`/assets/${assetWithId.id}`);
@@ -156,7 +156,7 @@ export default function Home() {
     router.push("/scan");
   };
 
-  if (isLoading || isLoadingAssets || globalIsLoading) {
+  if (isLoading || globalIsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

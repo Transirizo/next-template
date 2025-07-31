@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/lib/theme-provider/theme-provider";
 import { ThirdPartyScripts } from "@/lib/third-party-scripts/third-party-scripts";
 import { UserProvider } from "@/lib/user-context/user-context";
+import { ReduxProvider } from "@/lib/redux-provider/redux-provider";
 export const metadata: Metadata = {
   icons: {
     icon: "/icon/logo.svg",
@@ -28,10 +29,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <UserProvider>
-            <Toaster />
-            <TanstackProvider>{children}</TanstackProvider>
-          </UserProvider>
+          <ReduxProvider>
+            <UserProvider>
+              <Toaster />
+              <TanstackProvider>{children}</TanstackProvider>
+            </UserProvider>
+          </ReduxProvider>
         </ThemeProvider>
         <ThirdPartyScripts />
       </body>

@@ -84,8 +84,11 @@ export default function AssetList({ assets, user, onAssetClick, onAddAsset, onSc
     }
   };
 
+  // 确保 assets 是数组
+  const safeAssets = Array.isArray(assets) ? assets : [];
+  
   // 如果没有onSearch回调，则使用本地过滤（兼容模式）
-  const filteredAssets = onSearch ? assets : assets.filter(asset => {
+  const filteredAssets = onSearch ? safeAssets : safeAssets.filter(asset => {
     const matchesSearch = searchTerm === '' || 
       asset.assetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.assetCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,8 +101,8 @@ export default function AssetList({ assets, user, onAssetClick, onAddAsset, onSc
   });
 
   // 获取唯一的状态和类别用于过滤
-  const uniqueStatuses = [...new Set(assets.map(asset => asset.usageStatus))].filter(Boolean);
-  const uniqueCategories = [...new Set(assets.map(asset => asset.category))].filter(Boolean);
+  const uniqueStatuses = [...new Set(safeAssets.map(asset => asset.usageStatus))].filter(Boolean);
+  const uniqueCategories = [...new Set(safeAssets.map(asset => asset.category))].filter(Boolean);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">

@@ -1,5 +1,7 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
+import { FeishuAssetRecord } from "@/types/asset";
+import { transformFeishuAssetsArray } from "@/lib/data-transform";
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +25,19 @@ export async function POST(request: Request) {
       }
     );
 
-    return NextResponse.json(feishuResponse.data);
+    // 提取原始数据
+    const feishuRecords: FeishuAssetRecord[] = feishuResponse.data.data.items;
+
+    // 转换为应用格式
+    const transformedAssets = transformFeishuAssetsArray(feishuRecords);
+
+    // 返回转换后的数据，保持与现有 API 结构一致
+    return NextResponse.json({
+      success: true,
+      data: transformedAssets,
+      total: transformedAssets.length,
+      rawData: feishuResponse.data,
+    });
   } catch (error: any) {
     // Log the detailed error on the server
     console.error("Error calling Feishu API:", error.response?.data || error.message);

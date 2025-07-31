@@ -5,31 +5,16 @@ import Link from "next/link";
 import UserInfo from "@/components/UserInfo";
 import AssetForm from "@/components/AssetForm";
 import { AssetFormData } from "@/types/asset";
-import { useCreateAsset } from "@/hooks/useAssets";
 import { useUser } from "@/hooks/useUser";
 
 export default function AddAsset() {
   const router = useRouter();
   const { userInfo, isAuthenticated, isLoading } = useUser();
 
-  // 创建资产
-  const { mutateAsync: createAsset, isPending: isCreating } = useCreateAsset();
+  const isCreating = false;
 
   const handleSave = async (formData: AssetFormData): Promise<void> => {
-    try {
-      const response = await createAsset(formData);
-
-      // 成功后跳转到新创建的资产详情页
-      if (response.data) {
-        router.push(`/assets/${response.data.id}`);
-      } else {
-        // 如果没有返回ID，跳转到首页
-        router.push("/");
-      }
-    } catch (error) {
-      console.error("创建资产失败:", error);
-      throw error;
-    }
+    throw new Error("创建资产功能暂不可用");
   };
 
   const handleCancel = () => {
